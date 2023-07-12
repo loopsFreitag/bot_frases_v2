@@ -1,7 +1,6 @@
 package utilis
 
 import (
-	"fmt"
 	"math/rand"
 	"strconv"
 
@@ -29,15 +28,13 @@ func getMaxPage(c *colly.Collector, letter string) int {
 }
 
 func getVerb(c *colly.Collector, letter string, maxPage int) string {
-	var ulrVerbPage string
 	var verbo string
 	var transitividade string
 	verbos := make([][]string, 0)
+	ulrVerbPage := getUrl(VERBO, letter)
 
 	if maxPage > 0 {
 		ulrVerbPage = getUrl(VERBO, letter, rand.Intn(maxPage))
-	} else {
-		ulrVerbPage = getUrl(VERBO, letter)
 	}
 
 	c.OnHTML(".info-feat", func(e *colly.HTMLElement) {
@@ -50,7 +47,6 @@ func getVerb(c *colly.Collector, letter string, maxPage int) string {
 		//get a random verbo
 		randomIndex := rand.Intn(len(verbos))
 		verboslice := verbos[randomIndex]
-
 		verbo = verboslice[0]
 		transitividade = verboslice[1]
 	})
@@ -60,7 +56,6 @@ func getVerb(c *colly.Collector, letter string, maxPage int) string {
 
 	// get transitividade first if we cant handle we just call build phrase again
 	if !stringInSlice(transitividade, getSupportedTrasitividades()) {
-		fmt.Println("não deu")
 		return getVerb(c, letter, maxPage)
 	}
 
