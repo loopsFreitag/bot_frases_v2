@@ -7,20 +7,28 @@ import (
 	"github.com/gocolly/colly"
 )
 
-const VERBO = "verbo"
-const SUBISTANTIVO = "substantivo"
-const BASEURL = "https://dicionario.aizeta.com/verbetes"
+const (
+	VERBO        = "verbo"
+	SUBISTANTIVO = "substantivo"
+	BASEURL      = "https://dicionario.aizeta.com/verbetes"
+)
+
+type GrammarFunc func(string) []string
+
+var grammarFuncs = map[string]GrammarFunc{
+	"pret_imper":   pret_imper,
+	"pret_maisque": pret_maisque,
+	"futuro_pres":  futuro_pres,
+	"futuro_pret":  futuro_pret,
+}
 
 func BuildPhrase() []string {
-	//var plural bool
-
 	rand.Seed(time.Now().UnixNano())
+
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.dicionario.aizeta.com", "dicionario.aizeta.com"),
 	)
-	//plural = rand.Intn(2) != 0
 
-	//set a random delay so if we dont find a word it wont break
 	c.Limit(&colly.LimitRule{
 		RandomDelay: 2 * time.Second,
 		Parallelism: 4,
@@ -30,78 +38,49 @@ func BuildPhrase() []string {
 	maxPage := getMaxPage(c, letter)
 	verbo := getVerb(c, letter, maxPage)
 
-	//couldnt find a better way to do that
-	grammarTenses := getGrammaticalTense()
-	grammarTenseFn := grammarTenses[rand.Intn(len(grammarTenses))]
-	sufixo := callGrammarFn(grammarTenseFn, verbo)
+	grammarTenseFn := getRandomGrammarTense()
+	ending := verbo[len(verbo)-2:]
+	sufixo := grammarFuncs[grammarTenseFn](ending)
 
 	return sufixo
 }
 
-func getGrammaticalTense() []string {
-	return []string{"pret_imper", "pret_maisque", "futuro_pres", "futuro_pret"}
+func getRandomGrammarTense() string {
+	grammarTenses := []string{"pret_imper", "pret_maisque", "futuro_pres", "futuro_pret"}
+	randomIndex := rand.Intn(len(grammarTenses))
+	return grammarTenses[randomIndex]
 }
 
-func callGrammarFn(fn string, verbo string) []string {
-	var sufixo []string
-	switch fn {
-	case "pret_imper":
-		sufixo = pret_imper(verbo)
-	case "pret_maisque":
-		sufixo = pret_maisque(verbo)
-	case "futuro_pres":
-		sufixo = futuro_pres(verbo)
-	case "futuro_pret":
-		sufixo = futuro_pret(verbo)
-	}
-	return sufixo
-}
-
-func pret_imper(verbo string) []string {
-	var sufixos []string
-	if verbo[len(verbo)-2:] == "ar" {
-		sufixos = []string{"ava", "avas", "ava", "ávamos", "áveis", "avam"}
-	} else {
-		sufixos = []string{"ia", "ias", "ia", "íamos", "íeis", "iam"}
-	}
-	return sufixos
-}
-
-func pret_maisque(verbo string) []string {
-	var sufixos []string
-	ending := verbo[len(verbo)-2:]
+func pret_imper(ending string) []string {
 	if ending == "ar" {
-		sufixos = []string{"ara", "aras", "ara", "áramos", "áreis", "aram"}
-	} else if ending == "er" {
-		sufixos = []string{"era", "eras", "era", "êramos", "êreis", "eram"}
-	} else {
-		sufixos = []string{"ira", "iras", "ira", "íramos", "íreis", "iram"}
+		return []string{"ava", "avam"}
 	}
-	return sufixos
+	return []string{"ia", "iam"}
 }
 
-func futuro_pres(verbo string) []string {
-	var sufixos []string
-	ending := verbo[len(verbo)-2:]
+func pret_maisque(ending string) []string {
 	if ending == "ar" {
-		sufixos = []string{"arei", "arás", "ará", "aremos", "areis", "arão"}
+		return []string{"ara", "aram"}
 	} else if ending == "er" {
-		sufixos = []string{"erei", "erás", "erá", "eremos", "ereis", "erão"}
-	} else {
-		sufixos = []string{"irei", "irás", "irá", "iremos", "ireis", "irão"}
+		return []string{"era", "eram"}
 	}
-	return sufixos
+	return []string{"ira", "iram"}
 }
 
-func futuro_pret(verbo string) []string {
-	var sufixos []string
-	ending := verbo[len(verbo)-2:]
+func futuro_pres(ending string) []string {
 	if ending == "ar" {
-		sufixos = []string{"aria", "arias", "aria", "aríamos", "aríeis", "ariam"}
+		return []string{"ará", "arão"}
 	} else if ending == "er" {
-		sufixos = []string{"eria", "erias", "eria", "eríamos", "eríeis", "eriam"}
-	} else {
-		sufixos = []string{"iria", "irias", "iria", "iríamos", "iríeis", "iriam"}
+		return []string{"erá", "erão"}
 	}
-	return sufixos
+	return []string{"irá", "irão"}
+}
+
+func futuro_pret(ending string) []string {
+	if ending == "ar" {
+		return []string{"aria", "ariam"}
+	} else if ending == "er" {
+		return []string{"eria", "eriam"}
+	}
+	return []string{"iria", "iriam"}
 }
