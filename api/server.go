@@ -23,5 +23,8 @@ func (s *Server) Start() error {
 
 func (s *Server) handleGetRandomPhrase(w http.ResponseWriter, r *http.Request) {
 	phrase := utilis.BuildPhrase()
-	json.NewEncoder(w).Encode(phrase)
+	err := json.NewEncoder(w).Encode(phrase)
+	if err != nil {
+		return
+	}
 }

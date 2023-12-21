@@ -7,6 +7,11 @@ import (
 	"github.com/gocolly/colly"
 )
 
+type Verbo struct {
+	verbo          string
+	transitividade string
+}
+
 func getMaxPage(c *colly.Collector, letter string) int {
 	var maxPage int
 
@@ -27,10 +32,9 @@ func getMaxPage(c *colly.Collector, letter string) int {
 	return maxPage
 }
 
-func getVerb(c *colly.Collector, letter string, maxPage int) string {
-	var verbo string
-	var transitividade string
-	verbos := make([][]string, 0)
+func getVerb(c *colly.Collector, letter string, maxPage int) Verbo {
+	var verboStruct Verbo
+	verbos := make([]Verbo, 0)
 	ulrVerbPage := getUrl(VERBO, letter)
 
 	if maxPage > 0 {
@@ -39,25 +43,23 @@ func getVerb(c *colly.Collector, letter string, maxPage int) string {
 
 	c.OnHTML(".info-feat", func(e *colly.HTMLElement) {
 		// get all verbos from this page
-		// e.ChildText("p") is the word and e.ChildText("div") is the trasitividade
-		verbos = append(verbos, []string{e.ChildText("p"), e.ChildText("div")})
+		// e.ChildText("p") is the word and e.ChildText("div") is the transitividade
+		verbos = append(verbos, Verbo{e.ChildText("p"), e.ChildText("div")})
 	})
 
 	c.OnScraped(func(r *colly.Response) {
-		//get a random verbo
+		// get a random verbo
 		randomIndex := rand.Intn(len(verbos))
-		verboslice := verbos[randomIndex]
-		verbo = verboslice[0]
-		transitividade = verboslice[1]
+		verboStruct = verbos[randomIndex]
 	})
 
 	c.Visit(ulrVerbPage)
 	c.Wait()
 
-	// get transitividade first if we cant handle we just call build phrase again
-	if !stringInSlice(transitividade, getSupportedTrasitividades()) {
+	// get transitividade first if we can't handle we just call build phrase again
+	if !stringInSlice(verboStruct.transitividade, getSupportedTrasitividades()) {
 		return getVerb(c, letter, maxPage)
 	}
 
-	return verbo
+	return verboStruct
 }

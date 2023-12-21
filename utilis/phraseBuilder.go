@@ -25,6 +25,7 @@ var grammarFuncs = map[string]GrammarFunc{
 func BuildPhrase() []string {
 	rand.Seed(time.Now().UnixNano())
 
+	plural := rand.Intn(2) == 0
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.dicionario.aizeta.com", "dicionario.aizeta.com"),
 	)
@@ -39,10 +40,31 @@ func BuildPhrase() []string {
 	verbo := getVerb(c, letter, maxPage)
 
 	grammarTenseFn := getRandomGrammarTense()
-	ending := verbo[len(verbo)-2:]
+	ending := verbo.verbo[len(verbo.verbo)-2:]
 	sufixo := grammarFuncs[grammarTenseFn](ending)
 
-	return sufixo
+	verboStr := verbo.verbo[:len(verbo.verbo)-2] + sufixo[0]
+	if plural {
+		verboStr = verbo.verbo[:len(verbo.verbo)-2] + sufixo[1]
+	}
+
+	frase := getArtSub(plural) + " " + verboStr
+	switch verbo.transitividade {
+	case getSupportedTrasitividades()[0]:
+		return frase + " " + getArtSub(rand.Intn(2) == 0)
+	case getSupportedTrasitividades()[1]:
+		return frase
+	// if its vtd and itr, generate random vtd or itr
+	default:
+		randomNum := rand.Intn(2)
+		switch randomNum {
+		case 0:
+			return frase + " " + getArtSub(randomNum)
+		case 1:
+			return frase
+		}
+	}
+	return []string{verboStr}
 }
 
 func getRandomGrammarTense() string {
@@ -83,4 +105,11 @@ func futuro_pret(ending string) []string {
 		return []string{"eria", "eriam"}
 	}
 	return []string{"iria", "iriam"}
+}
+
+func getArtSub(plural bool) string {
+	letter := getRandomLetter(SUBISTANTIVO)
+	maxPage := getMaxPage(c, letter)
+	subistantivo := getVerb(c, letter, maxPage)
+
 }
