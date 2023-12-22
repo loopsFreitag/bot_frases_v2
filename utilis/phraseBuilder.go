@@ -35,36 +35,33 @@ func BuildPhrase() []string {
 		Parallelism: 4,
 	})
 
-	letter := getRandomLetter(VERBO)
-	maxPage := getMaxPage(c, letter)
-	verbo := getVerb(c, letter, maxPage)
+	verbo := getVerbOrSub(c, VERBO, plural)
 
 	grammarTenseFn := getRandomGrammarTense()
-	ending := verbo.verbo[len(verbo.verbo)-2:]
+	ending := verbo.word[len(verbo.word)-2:]
 	sufixo := grammarFuncs[grammarTenseFn](ending)
 
-	verboStr := verbo.verbo[:len(verbo.verbo)-2] + sufixo[0]
+	verboStr := verbo.word[:len(verbo.word)-2] + sufixo[0]
 	if plural {
-		verboStr = verbo.verbo[:len(verbo.verbo)-2] + sufixo[1]
+		verboStr = verbo.word[:len(verbo.word)-2] + sufixo[1]
 	}
 
-	frase := getArtSub(plural) + " " + verboStr
-	switch verbo.transitividade {
+	// INTRANSITIVO
+	frase := getVerbOrSub(c, SUBISTANTIVO, plural).word + " " + verboStr
+
+	switch verbo.util {
+	// TRANSITIVO DIRETO
 	case getSupportedTrasitividades()[0]:
-		return frase + " " + getArtSub(rand.Intn(2) == 0)
-	case getSupportedTrasitividades()[1]:
-		return frase
-	// if its vtd and itr, generate random vtd or itr
-	default:
+		frase = frase + " " + getVerbOrSub(c, SUBISTANTIVO, plural).word
+		// TRANSITIVO DIRETO OU INTRANSITIVO
+	case getSupportedTrasitividades()[2]:
 		randomNum := rand.Intn(2)
-		switch randomNum {
-		case 0:
-			return frase + " " + getArtSub(randomNum)
-		case 1:
-			return frase
+		if randomNum == 0 {
+			frase = frase + " " + getVerbOrSub(c, SUBISTANTIVO, plural).word
 		}
 	}
-	return []string{verboStr}
+
+	return []string{frase}
 }
 
 func getRandomGrammarTense() string {
@@ -105,11 +102,4 @@ func futuro_pret(ending string) []string {
 		return []string{"eria", "eriam"}
 	}
 	return []string{"iria", "iriam"}
-}
-
-func getArtSub(plural bool) string {
-	letter := getRandomLetter(SUBISTANTIVO)
-	maxPage := getMaxPage(c, letter)
-	subistantivo := getVerb(c, letter, maxPage)
-
 }

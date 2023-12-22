@@ -7,9 +7,11 @@ import (
 	"github.com/gocolly/colly"
 )
 
-type Verbo struct {
-	verbo          string
-	transitividade string
+type GrammarClass struct {
+	word string
+	//Verbo is transitivade
+	//Subsitantivo is genero
+	util string
 }
 
 func getMaxPage(c *colly.Collector, letter string) int {
@@ -32,34 +34,40 @@ func getMaxPage(c *colly.Collector, letter string) int {
 	return maxPage
 }
 
-func getVerb(c *colly.Collector, letter string, maxPage int) Verbo {
-	var verboStruct Verbo
-	verbos := make([]Verbo, 0)
-	ulrVerbPage := getUrl(VERBO, letter)
+func getVerbOrSub(c *colly.Collector, grammarClass string, plural bool) GrammarClass {
+	letter := getRandomLetter(grammarClass)
+	maxPage := getMaxPage(c, letter)
+
+	var wordStruct GrammarClass
+	grammarstr := make([]GrammarClass, 0)
+	ulrPage := getUrl(grammarClass, letter)
 
 	if maxPage > 0 {
-		ulrVerbPage = getUrl(VERBO, letter, rand.Intn(maxPage))
+		ulrPage = getUrl(grammarClass, letter, rand.Intn(maxPage))
 	}
 
 	c.OnHTML(".info-feat", func(e *colly.HTMLElement) {
 		// get all verbos from this page
-		// e.ChildText("p") is the word and e.ChildText("div") is the transitividade
-		verbos = append(verbos, Verbo{e.ChildText("p"), e.ChildText("div")})
+		// e.ChildText("p") is the word and e.ChildText("div") is the util transitivade/genero
+		grammarstr = append(grammarstr, GrammarClass{e.ChildText("p"), e.ChildText("div")})
 	})
 
 	c.OnScraped(func(r *colly.Response) {
-		// get a random verbo
-		randomIndex := rand.Intn(len(verbos))
-		verboStruct = verbos[randomIndex]
+		if len(grammarstr) > 0 {
+			randomIndex := rand.Intn(len(grammarstr))
+			wordStruct = grammarstr[randomIndex]
+		}
 	})
 
-	c.Visit(ulrVerbPage)
+	c.Visit(ulrPage)
 	c.Wait()
-
+	//if its an verbo we see if we can handle the transitividade
 	// get transitividade first if we can't handle we just call build phrase again
-	if !stringInSlice(verboStruct.transitividade, getSupportedTrasitividades()) {
-		return getVerb(c, letter, maxPage)
+	if grammarClass == VERBO {
+		if !stringInSlice(wordStruct.util, getSupportedTrasitividades()) {
+			return getVerbOrSub(c, grammarClass, plural)
+		}
 	}
 
-	return verboStruct
+	return wordStruct
 }
