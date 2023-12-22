@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"example/bot-frases/utilis"
 	"net/http"
+	"strings"
+	"unicode"
 )
 
 type Server struct {
@@ -23,7 +25,10 @@ func (s *Server) Start() error {
 
 func (s *Server) handleGetRandomPhrase(w http.ResponseWriter, r *http.Request) {
 	phrase := utilis.BuildPhrase()
-	err := json.NewEncoder(w).Encode(phrase)
+
+	lowercase := strings.ToLower(phrase)
+	result := string(unicode.ToUpper(rune(lowercase[0]))) + lowercase[1:]
+	err := json.NewEncoder(w).Encode(result)
 	if err != nil {
 		return
 	}

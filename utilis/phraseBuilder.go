@@ -22,7 +22,7 @@ var grammarFuncs = map[string]GrammarFunc{
 	"futuro_pret":  futuro_pret,
 }
 
-func BuildPhrase() []string {
+func BuildPhrase() string {
 	rand.Seed(time.Now().UnixNano())
 
 	plural := rand.Intn(2) == 0
@@ -61,7 +61,7 @@ func BuildPhrase() []string {
 		}
 	}
 
-	return []string{frase}
+	return frase
 }
 
 func getRandomGrammarTense() string {
@@ -102,4 +102,20 @@ func futuro_pret(ending string) []string {
 		return []string{"eria", "eriam"}
 	}
 	return []string{"iria", "iriam"}
+}
+
+func artMascPlural() []string {
+	return []string{"os", "uns"}
+}
+
+func artMascSingular() []string {
+	return []string{"o", "um"}
+}
+
+func artFemPlural() []string {
+	return []string{"as", "umas"}
+}
+
+func artFemSingular() []string {
+	return []string{"a", "uma"}
 }

@@ -67,6 +67,25 @@ func getVerbOrSub(c *colly.Collector, grammarClass string, plural bool) GrammarC
 		if !stringInSlice(wordStruct.util, getSupportedTrasitividades()) {
 			return getVerbOrSub(c, grammarClass, plural)
 		}
+		return wordStruct
+	}
+
+	if plural {
+		//masculino
+		if wordStruct.util == "s.m." {
+			wordStruct.word = artMascPlural()[rand.Intn(2)] + " " + wordStruct.word + "s"
+		} else {
+			//feminino
+			wordStruct.word = artFemPlural()[rand.Intn(2)] + " " + wordStruct.word + "s"
+		}
+	} else {
+		//masculino
+		if wordStruct.util == "s.m." {
+			wordStruct.word = artMascSingular()[rand.Intn(2)] + " " + wordStruct.word
+		} else {
+			//feminino
+			wordStruct.word = artFemSingular()[rand.Intn(2)] + " " + wordStruct.word
+		}
 	}
 
 	return wordStruct
