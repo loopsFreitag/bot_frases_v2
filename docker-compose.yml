@@ -17,3 +17,13 @@ services:
       - "443:443"
     depends_on:
       - bot_frases
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/etc:/etc/letsencrypt
+      - ./certbot/var:/var/lib/letsencrypt
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/html --email guilherme.lopes.freitas@gmail.com --agree-tos --no-eff-email -d botfrases.com
+
