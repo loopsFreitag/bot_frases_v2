@@ -34,7 +34,6 @@ func (s *Server) handleGetRandomPhrase(w http.ResponseWriter, r *http.Request) {
 		"message": result,
 	}
 
-	// Use json.NewEncoder to encode the map and write it to the response writer
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
