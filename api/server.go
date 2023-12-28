@@ -20,6 +20,7 @@ func NewServer(listenAddr string) *Server {
 
 func (s *Server) Start() error {
 	http.HandleFunc("/phrase", s.handleGetRandomPhrase)
+	http.Handle("/", http.FileServer(http.Dir("./static")))
 	return http.ListenAndServe(s.listenAddr, nil)
 }
 

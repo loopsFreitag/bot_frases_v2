@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Phrases</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1em;
+            font-size: 1.5em;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        #phrase-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<header>
+    Bot Phrases Generator
+</header>
+<main>
+    <div id="phrase-container">
+        <p id="phrase">Click the button to generate a random bot phrase!</p>
+        <button onclick="generatePhrase()">Generate Phrase</button>
+    </div>
+</main>
+<script>
+    const phrases = [
+        "Hello, how can I assist you?",
+        "I'm just a bot, but I'm here to help!",
+        "Ask me anything, and I'll do my best to respond.",
+        "Isn't technology fascinating?",
+        "I'm your virtual assistant, ready to chat.",
+        "What's on your mind today?",
+        "Did you know that I'm not a human?",
+        "I'm here 24/7. Feel free to talk to me anytime."
+    ];
+
+    function generatePhrase() {
+        const randomIndex = Math.floor(Math.random() * phrases.length);
+        const randomPhrase = phrases[randomIndex];
+        document.getElementById('phrase').innerHTML = randomPhrase;
+    }
+</script>
+</body>
+</html>
