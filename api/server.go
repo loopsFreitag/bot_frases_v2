@@ -29,7 +29,14 @@ func (s *Server) handleGetRandomPhrase(w http.ResponseWriter, r *http.Request) {
 
 	lowercase := strings.ToLower(phrase)
 	result := string(unicode.ToUpper(rune(lowercase[0]))) + lowercase[1:]
-	err := json.NewEncoder(w).Encode(result)
+
+	response := map[string]interface{}{
+		"message": result,
+	}
+
+	// Use json.NewEncoder to encode the map and write it to the response writer
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		return
 	}
