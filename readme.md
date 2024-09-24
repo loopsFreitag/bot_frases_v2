@@ -1,9 +1,10 @@
-# bot frases v2
+## ⚠️ Project Status: Archived
 
-this project is an enhanced version of [this project](https://github.com/loopsFreitag/frases-bot)
+**This project is no longer maintained.**
 
-now rewrited in go and upload in aws ec2 using github actions
+One of the core dependencies of this application is no longer available, which has rendered the project non-functional in its current state. As a result, we have decided to discontinue its support and development.
 
-you can access it here [bot frases](https://botfrases.com/phrase)
+However, we are actively working on migrating the application to a new provider. Updates regarding the new version and any further developments will be shared here once available.
 
-and it will 
+Thank you for your understanding and support.
+
